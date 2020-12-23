@@ -1,6 +1,6 @@
 package storage
 
 type Storage interface {
-	LoadNote(id string) (error, *Note)
+	LoadNote(id string) (*Note, error)
 	SaveNote(note *Note) error
 }

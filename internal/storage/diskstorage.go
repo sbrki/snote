@@ -17,15 +17,15 @@ func NewDiskStorage(path string) *DiskStorage {
 	return &DiskStorage{path}
 }
 
-func (ds *DiskStorage) LoadNote(id string) (error, *Note) {
+func (ds *DiskStorage) LoadNote(id string) (*Note, error) {
 	filename := path.Join(ds.path, id+".json")
 	b, err := ioutil.ReadFile(filename)
 	if err != nil {
-		return err, nil
+		return nil, err
 	}
 	note := new(Note)
 	json.Unmarshal(b, note)
-	return nil, note
+	return note, nil
 }
 
 func (ds *DiskStorage) SaveNote(note *Note) error {
