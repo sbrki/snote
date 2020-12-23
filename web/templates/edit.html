@@ -1,0 +1,52 @@
+<html>
+	<head>
+		<title>snote</title>
+		<meta charset="utf-8"/>
+		<!-- codemirror -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.0/codemirror.min.css" integrity="sha512-MWdvo/Qqcf4pY1ecQUB1uBn0qLp19U/qJ1Rpp2BDZeuBA7YsFEwkvqR/+aG4BroPiAYDunKJ6X8R/Pmdt3p7oA==" crossorigin="anonymous" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.0/theme/rubyblue.min.css" integrity="sha512-pt+OhZW7o2pmHEahNFroPWkGR89L0tmDqCzXK+7WM1vGLtUyxms1JxZsXgJbOdFwylRnEt0yHnU6y2uAs40FxQ==" crossorigin="anonymous" />
+		<!-- switchery -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/switchery/0.8.2/switchery.min.css" integrity="sha512-uyGg6dZr3cE1PxtKOCGqKGTiZybe5iSq3LsqOolABqAWlIRLo/HKyrMMD8drX+gls3twJdpYX0gDKEdtf2dpmw==" crossorigin="anonymous" />
+		<!-- custom css -->
+		<link rel="stylesheet" href="/static/style.css">
+
+	</head>
+	<body>
+		<!-- codemirror -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.0/codemirror.min.js" integrity="sha512-guAOPzMlYhWXne9TpfFRWD7iI0YnDTVqNN8fNgZGeqcmZFuUKWxD1/74Rsse81voD2uzxyBJkkp97G/tahKipg==" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.0/keymap/vim.min.js" integrity="sha512-g2nzBS/fBHxdSRXaDcYGHVg2Rjk7+3gITKVMv1q/ylh2izUiw1AZ50urelrhy7I6EYLQi5RM8FFj3rdATH5wIg==" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.0/mode/markdown/markdown.min.js" integrity="sha512-pPkSf38IdZFkYSNeSKtKBG1ou5FuWwHYuDEiRJRs29igFixW47YY2iIKWhSfDLbpZlI5NO5b3M28KW/u3K2hJw==" crossorigin="anonymous"></script>
+		<!-- switchery -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/switchery/0.8.2/switchery.min.js" integrity="sha512-lC8vSUSlXWqh7A/F+EUS3l77bdlj+rGMN4NB5XFAHnTR3jQtg4ibZccWpuSSIdPoPUlUxtnGktLyrWcDhG8RvA==" crossorigin="anonymous"></script>
+
+
+		<h1>snote</h1>
+		<input id="vim-checkbox" type="checkbox"/>
+		<label for="vim-checkbox">Vim</label>
+
+		<textarea id="editor" style="width:80%; height:80vh;"></textarea>
+		<script>
+			var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
+				lineNumbers: true,
+				theme: "rubyblue",
+				mode: "markdown",
+				keyMap: "default",
+				showCursorWhenSelecting: true
+			});
+
+
+			// Vim mode switch
+			var vimSwitch = new Switchery(document.getElementById("vim-checkbox"), {'size':'small'});
+			document.getElementById("vim-checkbox").onchange = function() {
+				var checkBox = document.getElementById("vim-checkbox");
+				if (checkBox.checked == true){
+					editor.setOption("keyMap", "vim");
+					document.getElementById("editor").focus();
+				} else {
+					editor.setOption("keyMap", "default");
+					document.getElementById("editor").focus();
+				}	
+			};
+		</script>
+	</body>
+</html>
