@@ -13,7 +13,7 @@ type DiskStorage struct {
 
 func NewDiskStorage(path string) *DiskStorage {
 	// create path if it doesn't exists
-	os.MkdirAll(path, 0600)
+	os.MkdirAll(path, 0700)
 	return &DiskStorage{path}
 }
 
@@ -30,7 +30,7 @@ func (ds *DiskStorage) LoadNote(id string) (error, *Note) {
 
 func (ds *DiskStorage) SaveNote(note *Note) error {
 	filename := path.Join(ds.path, note.ID+".json")
-	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0700)
 	defer f.Close()
 	if err != nil {
 		return err
