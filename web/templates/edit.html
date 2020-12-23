@@ -41,10 +41,10 @@
 				var checkBox = document.getElementById("vim-checkbox");
 				if (checkBox.checked == true){
 					editor.setOption("keyMap", "vim");
-					document.getElementById("editor").focus();
+					editor.focus();
 				} else {
 					editor.setOption("keyMap", "default");
-					document.getElementById("editor").focus();
+					editor.focus();
 				}	
 			};
 		</script>
