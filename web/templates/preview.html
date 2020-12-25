@@ -3,18 +3,20 @@
 		{{ template "head.html" . }}
 	</head>
 	<body>
-		<h1>snote</h1>
-		<input id="vim-checkbox" type="checkbox"/>
-		<label for="vim-checkbox">Vim</label>
-		<div id="save-button-animator" style="float:right;">
-			<a id="save-button" href="#" onclick="saveNote();">save</a>
+
+		<a href="/{{.ID}}/edit">edit</a>
+		<div class="pure-g">
+			<div class="pure-u-4-24"></div>
+			<div class="pure-u-16-24">
+				{{ .RenderedHTML }}
+			</div>
+			<div class="pure-u-4-24"></div>
 		</div>
 
-		<textarea id="editor" style="width:80%; height:80vh;"></textarea>
 		<script>
 			var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
 				lineNumbers: true,
-				theme: "default",
+				theme: "rubyblue",
 				mode: "markdown",
 				keyMap: "default",
 				showCursorWhenSelecting: true
@@ -73,10 +75,6 @@
 					} else if (xhr.readyState == 4) {
 						document.getElementById("save-button").style.color = "green";
 						document.getElementById("save-button").innerHTML = "SAVED!";
-						document.getElementById("save-button-animator").classList.remove("animate__animated");
-						document.getElementById("save-button-animator").classList.remove("animate__tada");
-						document.getElementById("save-button-animator").classList.add("animate__animated");
-						document.getElementById("save-button-animator").classList.add("animate__tada");
 						//notyf.success("saved!");
 					}
 				}
@@ -101,17 +99,6 @@
 					}, 3000);
 				}
 			});
-
-			// call saveNote() on ctrl+s (or CMD+s)
-			document.addEventListener("keydown", function(e) {
-				if ((window.navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey) && e.keyCode == 83) {
-					e.preventDefault();
-					saveNote();
-				}
-			}, false);
-
-			// override codemirror default save (eg. :w in vim mode)
-			// CodeMirror.commands.save = saveNote();
 
 		</script>
 	</body>

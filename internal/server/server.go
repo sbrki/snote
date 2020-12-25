@@ -62,7 +62,10 @@ func (s *Server) setupRoutes() {
 
 		parser := parser.NewWithExtensions(parser.CommonExtensions)
 		html := markdown.ToHTML([]byte(note.Contents), parser, nil)
-		return c.HTML(http.StatusOK, string(html))
+		return c.Render(http.StatusOK, "preview.html", struct {
+			RenderedHTML string
+			ID           string
+		}{string(html), note.ID})
 	})
 
 	s.echo.GET("/somenote", func(c echo.Context) error {
