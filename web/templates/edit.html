@@ -3,9 +3,40 @@
 		{{ template "head.html" . }}
 	</head>
 	<body>
-		<h1>snote</h1>
-		<input id="vim-checkbox" type="checkbox"/>
-		<label for="vim-checkbox">Vim</label>
+
+
+
+		<div class="pure-menu pure-menu-horizontal">
+			<ul class="pure-menu-list">
+				<li class="pure-menu-item">
+					<a href="#" class="pure-menu-link" style="color:#add8e6;">snote</a>
+				</li>	
+				<li class="pure-menu-item">
+					<a href="#" class="pure-menu-link">new</a>
+				</li>	
+				<li class="pure-menu-item">
+					<input id="vim-checkbox" style="display:none;" type="checkbox"/>
+					<label id="vim-checkbox-label" for="vim-checkbox" class="pure-menu-link">Vim mode</label>
+				</li>
+				<li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+					<a href="#" id="menuLink1" class="pure-menu-link">Contact</a>
+					<ul class="pure-menu-children">
+						<li class="pure-menu-item">
+							<a href="#" class="pure-menu-link">Email</a>
+						</li>
+						<li class="pure-menu-item">
+							<a href="#" class="pure-menu-link">Twitter</a>
+						</li>
+						<li class="pure-menu-item">
+							<a href="#" class="pure-menu-link">Tumblr Blog</a>
+						</li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+
+
+
 		<div id="save-button-animator" style="float:right;">
 			<a id="save-button" href="#" onclick="saveNote();">save</a>
 		</div>
@@ -27,15 +58,16 @@
 
 
 			// Vim mode switch
-			var vimSwitch = new Switchery(document.getElementById("vim-checkbox"), {'size':'small'});
 			document.getElementById("vim-checkbox").onchange = function() {
 				var checkBox = document.getElementById("vim-checkbox");
 				if (checkBox.checked == true){
 					editor.setOption("keyMap", "vim");
+					document.getElementById("vim-checkbox-label").style.color = "green";
 					editor.focus();
 				} else {
 					editor.setOption("keyMap", "default");
 					editor.focus();
+					document.getElementById("vim-checkbox-label").style.color = null;
 				}	
 			};
 
