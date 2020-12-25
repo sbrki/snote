@@ -6,4 +6,5 @@ require (
 	github.com/gomarkdown/markdown v0.0.0-20201113031856-722100d81a8e
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/echo/v4 v4.1.17
+	github.com/patrickmn/go-cache v2.1.0+incompatible
 )

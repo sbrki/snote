@@ -9,6 +9,7 @@ import (
 	"github.com/gomarkdown/markdown/parser"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"github.com/patrickmn/go-cache"
 	"github.com/sbrki/snote/internal/storage"
 )
 
@@ -16,6 +17,7 @@ type Server struct {
 	storage          storage.Storage
 	templateRegistry *TemplateRegistry
 	echo             *echo.Echo
+	renderCache      *cache.Cache
 }
 
 func NewServer(storage storage.Storage, templateRegistry *TemplateRegistry) *Server {
@@ -24,6 +26,7 @@ func NewServer(storage storage.Storage, templateRegistry *TemplateRegistry) *Ser
 	s.templateRegistry = templateRegistry
 	s.echo = echo.New()
 	s.echo.Renderer = s.templateRegistry
+	s.renderCache = cache.New(1*time.Hour, 1*time.Minute)
 
 	s.echo.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
 		Format: "method=${method}, uri=${uri}, status=${status}, " +
@@ -60,12 +63,22 @@ func (s *Server) setupRoutes() {
 			return echo.NewHTTPError(http.StatusNotFound, "404 Not found")
 		}
 
-		parser := parser.NewWithExtensions(parser.CommonExtensions)
-		html := markdown.ToHTML([]byte(note.Contents), parser, nil)
+		// render the note markdown contents to html.
+		// rendered html is cached as it takes approx. 1s to render a 5k LoC markdown.
+		// first, check if html rendering of markdown exists in cache
+		html, found := s.renderCache.Get(note.ID)
+		if !found {
+			// if not, render it
+			parser := parser.NewWithExtensions(parser.CommonExtensions)
+			html = markdown.ToHTML([]byte(note.Contents), parser, nil)
+			// add it to cache
+			s.renderCache.SetDefault(note.ID, html)
+		}
+
 		return c.Render(http.StatusOK, "preview.html", struct {
 			RenderedHTML string
 			ID           string
-		}{string(html), note.ID})
+		}{fmt.Sprintf("%s", html), note.ID})
 	})
 
 	s.echo.GET("/somenote", func(c echo.Context) error {
