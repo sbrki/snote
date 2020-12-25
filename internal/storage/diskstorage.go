@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"strings"
 )
 
 type DiskStorage struct {
@@ -41,4 +42,28 @@ func (ds *DiskStorage) SaveNote(note *Note) error {
 	}
 	f.Write(json)
 	return nil
+}
+
+func (ds *DiskStorage) DeleteNote(id string) error {
+	err := os.Remove(path.Join(ds.path, id+".json"))
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (ds *DiskStorage) GetAllNoteIDs() ([]string, error) {
+	IDs := make([]string, 0)
+	files, err := ioutil.ReadDir(ds.path)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, file := range files {
+		if !file.IsDir() && strings.Contains(file.Name(), ".json") {
+			ID := strings.Split(file.Name(), ".json")[0]
+			IDs = append(IDs, ID)
+		}
+	}
+	return IDs, nil
 }

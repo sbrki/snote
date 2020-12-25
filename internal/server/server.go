@@ -48,8 +48,9 @@ func (s *Server) setupRoutes() {
 
 	s.echo.GET("/:note_id/edit", func(c echo.Context) error {
 		id := c.Param("note_id")
+
 		_, err := s.storage.LoadNote(id)
-		if err != nil {
+		if err != nil && id != "ls" {
 			return echo.NewHTTPError(http.StatusNotFound, "404 Not found")
 		}
 
@@ -58,9 +59,24 @@ func (s *Server) setupRoutes() {
 
 	s.echo.GET("/:note_id", func(c echo.Context) error {
 		id := c.Param("note_id")
-		note, err := s.storage.LoadNote(id)
-		if err != nil {
-			return echo.NewHTTPError(http.StatusNotFound, "404 Not found")
+		var note *storage.Note
+
+		if id == "ls" {
+			note := new(storage.Note)
+			note.GenerateLs(s.storage)
+			parser := parser.NewWithExtensions(parser.CommonExtensions)
+			html := markdown.ToHTML([]byte(note.Contents), parser, nil)
+			return c.Render(http.StatusOK, "preview.html", struct {
+				RenderedHTML string
+				ID           string
+			}{fmt.Sprintf("%s", html), note.ID})
+
+		} else {
+			storedNote, err := s.storage.LoadNote(id)
+			if err != nil {
+				return echo.NewHTTPError(http.StatusNotFound, "404 Not found")
+			}
+			note = storedNote
 		}
 
 		// render the note markdown contents to html.
@@ -107,10 +123,13 @@ func (s *Server) setupRoutes() {
 	})
 
 	// API
+	s.echo.GET("/api/note_prototype", s.notePrototypeHandler)
 	s.echo.GET("/api/note/:note_id", s.noteGetHandler)
 	s.echo.PUT("/api/note/:note_id", s.notePutHandler)
+	s.echo.DELETE("/api/note/:note_id", s.noteDeleteHandler)
 }
 
 func (s *Server) Run() {
+	fmt.Println(s.storage.GetAllNoteIDs())
 	s.echo.Logger.Fatal(s.echo.Start(":8081"))
 }

@@ -23,17 +23,17 @@
 				</li>	
 				<li class="pure-menu-item">
 					<div id="save-button-animator">
-						<a href="../" class="pure-menu-link" >preview</a>
+						<a id="preview-url" class="pure-menu-link">preview</a>
 					</div>
 				</li>	
 				<li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
 					<a href="#" id="menuLink1" class="pure-menu-link">menu</a>
 					<ul class="pure-menu-children">
 						<li class="pure-menu-item">
-							<a href="#" class="pure-menu-link">new note</a>
+							<a href="#" class="pure-menu-link" style="color:blue;" onclick="newNotePrompt();">new note</a>
 						</li>
 						<li class="pure-menu-item">
-							<a href="#" class="pure-menu-link">all notes (/ls)</a>
+							<a href="/ls" class="pure-menu-link">all notes (/ls)</a>
 						</li>
 						<li class="pure-menu-item">
 							<a href="#" class="pure-menu-link">all tags(/lstag)</a>
@@ -45,7 +45,7 @@
 							<hr style+"pure-menu-link"/>
 						</li>
 						<li class="pure-menu-item">
-							<a href="#" class="pure-menu-link" style="color:red;">delete note</a>
+							<a href="#" class="pure-menu-link" style="color:red;" onclick="deleteNotePrompt();">delete note</a>
 						</li>
 					</ul>
 				</li>
@@ -85,6 +85,10 @@
 					document.getElementById("vim-checkbox-label").style.color = null;
 				}	
 			};
+
+			// set the preview href
+			var currentNoteID = window.location.pathname.split("/")[1];
+			document.getElementById("preview-url").href = "/"+currentNoteID;
 
 			// get current note contents from API
 			var currentNoteID = window.location.pathname.split("/")[1];
@@ -159,6 +163,76 @@
 
 			// override codemirror default save (eg. :w in vim mode)
 			// CodeMirror.commands.save = saveNote();
+
+
+
+			function newNotePrompt(){
+				var newNoteID = window.prompt("Enter ID of the new note:\n(the note will live at /<note ID>)");
+				// check if the note with the provided ID already exists:
+				var xhr = new XMLHttpRequest();
+				xhr.open('GET', "/api/note/"+newNoteID, true);
+				xhr.responseType = 'json';
+				xhr.onload = function() {
+					if (xhr.status === 404) {
+						// if it does not exist, fetch prototype
+						var xhr2 = new XMLHttpRequest();
+						xhr2.open('GET', "/api/note_prototype", false); // synchronous
+						xhr2.send();
+						if (xhr2.status == 200) {
+							var prototype = JSON.parse(xhr2.response);
+							prototype.id = newNoteID;
+							prototype.contents = "# " + newNoteID;
+
+							var xhr3 = new XMLHttpRequest();
+							xhr3.open('PUT', "/api/note/"+newNoteID, false);
+							xhr3.setRequestHeader("Content-Type", "application/json");
+							xhr3.send(JSON.stringify(prototype));
+							if (xhr3.status == 201) {
+								//success
+								window.location.replace("/"+newNoteID+"/edit");
+								return
+							} else {
+								// not success
+								alert("Error creating new note (failed to PUT prototype)");
+								return
+							}
+							
+
+
+
+						} else {
+							alert("error fetching note prototype")
+							return;
+						}
+
+
+					} else {
+						alert("note already exists!");
+					}
+				};
+				xhr.send();
+			}
+
+			function deleteNotePrompt() {
+				var currentNoteID = window.location.pathname.split("/")[1];
+				var confirmation = window.prompt("type 'yes' to confirm deletion");
+				if (confirmation != "yes") {
+					return
+				}
+				var xhr = new XMLHttpRequest();
+				xhr.open('DELETE', "/api/note/"+currentNoteID, false);
+				xhr.send();
+				if (xhr.status == 200) {
+					//success
+					window.location.replace("/ls");
+					return
+				} else {
+					// not success
+					alert("error deleting note.");
+					return
+				}
+
+			}
 
 		</script>
 	</body>
