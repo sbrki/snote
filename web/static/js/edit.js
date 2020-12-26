@@ -60,6 +60,7 @@ let noteJson;
 
 	$editor.value = contents;
 	editor.getDoc().setValue(contents);
+	editor.save = saveNote;
 })();
 
 async function saveNote() {
