@@ -4,7 +4,21 @@
 	</head>
 	<body>
 
-		<a href="/{{.ID}}/edit">edit</a>
+		<div class="pure-g">
+			<div class="pure-u-1">
+				<div class="pure-menu pure-menu-horizontal" style="display:block;">
+					<ul class="pure-menu-list">
+						<li class="pure-menu-item">
+							<a href="#" class="pure-menu-link" style="color:#add8e6;">snote</a>
+						</li>	
+						<li class="pure-menu-item">
+							<a href="/{{.ID}}/edit" class="pure-menu-link">edit</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
 		<div class="pure-g">
 			<div class="pure-u-4-24"></div>
 			<div class="pure-u-16-24">
@@ -14,95 +28,8 @@
 		</div>
 
 		<script>
-		document.querySelectorAll('img').forEach(x=>x.classList.add('pure-img'));
-		document.querySelectorAll('table').forEach(x=>x.classList.add('pure-table'));
-
-			var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
-				lineNumbers: true,
-				theme: "rubyblue",
-				mode: "markdown",
-				keyMap: "default",
-				showCursorWhenSelecting: true
-			});
-			editor.setSize("100%", "100%");
-
-			var notyf = new Notyf();
-
-			var noteJSON = null;
-
-
-			// Vim mode switch
-			var vimSwitch = new Switchery(document.getElementById("vim-checkbox"), {'size':'small'});
-			document.getElementById("vim-checkbox").onchange = function() {
-				var checkBox = document.getElementById("vim-checkbox");
-				if (checkBox.checked == true){
-					editor.setOption("keyMap", "vim");
-					editor.focus();
-				} else {
-					editor.setOption("keyMap", "default");
-					editor.focus();
-				}	
-			};
-
-			// get current note contents from API
-			var currentNoteID = window.location.pathname.split("/")[1];
-			var xhr = new XMLHttpRequest();
-			xhr.open('GET', "/api/note/"+currentNoteID, true);
-			xhr.responseType = 'json';
-			xhr.onload = function() {
-				if (xhr.status === 200) {
-					document.getElementById("editor").value = xhr.response.contents;
-					editor.getDoc().setValue(xhr.response.contents);
-					noteJSON = xhr.response;
-				} else {
-					alsert("Error sending GET request to fetch note");
-					alert(xhr.status);
-				}
-			};
-			xhr.send();
-
-			// function that sends PUT request in order to save note
-			function saveNote() {
-				document.getElementById("save-button").style.color = "gray";
-				var currentNoteID = window.location.pathname.split("/")[1];
-				var xhr = new XMLHttpRequest();
-				xhr.open('PUT', "/api/note/"+currentNoteID, true);
-				xhr.setRequestHeader("Content-Type", "application/json");
-				xhr.onreadystatechange = function() {
-					if(xhr.readyState == 4 && xhr.status != 200) {
-						alert("Error sending PUT request to save note");
-						alert(xhr.status);
-						document.getElementById("save-button").style.color = "red";
-						document.getElementById("save-button").innerHTML = "ERROR SAVING";
-						notyf.error("error saving note!");
-					} else if (xhr.readyState == 4) {
-						document.getElementById("save-button").style.color = "green";
-						document.getElementById("save-button").innerHTML = "SAVED!";
-						//notyf.success("saved!");
-					}
-				}
-				noteJSON.contents = editor.getDoc().getValue();
-				xhr.send(JSON.stringify(noteJSON));
-			}
-
-			// automatically call saveNote() on every 50 keystrokes
-			var keystrokeNum = 0;
-			editor.on("change", function(){
-				keystrokeNum++;
-				if (keystrokeNum >= 50) {
-					saveNote();
-					keystrokeNum = 0;
-				} else if (document.getElementById("save-button").style.color != "gray") {
-					// if the saveNote() was called on the keystroke prior to this one,
-					// set the color indication back to grey (after 3000ms, let the user
-					// notice that the file was saved.)
-					setTimeout(function(){
-						document.getElementById("save-button").style.color = "gray";
-						document.getElementById("save-button").innerHTML = "save";
-					}, 3000);
-				}
-			});
-
+			document.querySelectorAll('img').forEach(x=>x.classList.add('pure-img'));
+			document.querySelectorAll('table').forEach(x=>x.classList.add('pure-table'));
 		</script>
 	</body>
 </html>
