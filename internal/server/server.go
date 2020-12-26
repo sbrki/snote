@@ -43,7 +43,7 @@ func NewServer(storage storage.Storage, templateRegistry *TemplateRegistry) *Ser
 
 func (s *Server) setupRoutes() {
 	s.echo.GET("/", func(c echo.Context) error {
-		return c.Render(http.StatusOK, "edit.html", nil)
+		return c.Redirect(http.StatusTemporaryRedirect, "/ls")
 	})
 
 	s.echo.GET("/:note_id/edit", func(c echo.Context) error {
