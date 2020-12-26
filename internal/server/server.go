@@ -130,6 +130,5 @@ func (s *Server) setupRoutes() {
 }
 
 func (s *Server) Run() {
-	fmt.Println(s.storage.GetAllNoteIDs())
 	s.echo.Logger.Fatal(s.echo.Start(":8081"))
 }
