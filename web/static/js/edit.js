@@ -118,42 +118,29 @@ document.addEventListener("keydown", async (e) => {
 	}
 }, false);
 
+
 async function newNotePrompt() {
 	const newNoteId = window.prompt("Enter ID of the new note:\n(the note will live at /<note ID>)");
-
-	const noteExistsResponse = await fetch(`/api/note/${newNoteId}`);
-	if (noteExistsResponse.status !== 404) {
-		alert("note already exists!");
-		return;
-	}
-
-	const prototypeResponse = await fetch("/api/note_prototype");
-	if (prototypeResponse.status !== 200) {
-		alert("error fetching note prototype")
-		return;
-	}
-
-	const prototype = await prototypeResponse.json();
-	prototype.id = newNoteId;
-	prototype.contents = `# ${newNoteId}`;
-
-	const createNoteResponse = await fetch(
-		`/api/note/${newNoteId}`,
+	let formData = new FormData();
+	formData.append("suggested_id", newNoteId);
+	const newNoteResponse = await fetch(`/api/note`,
 		{
-			method: "PUT",
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(prototype),
+			method: "POST",
+			body: formData,
 		},
 	);
 
-	if (createNoteResponse.status === 201) {
-		window.location.replace(`/${newNoteId}/edit`);
-	} else {
-		alert("Error creating new note (failed to PUT prototype)");
+	if (newNoteResponse.status === 409) {
+		alert("Note already exists!");
+		return;
+	} else if (newNoteResponse.status !== 201) {
+		alert("Error creating note!");
+		alert(newNoteResponse.status);
+		return;
 	}
+	window.location.replace(`/${newNoteId}/edit`);
 }
+
 
 async function deleteNotePrompt() {
 	const confirmation = window.prompt("Type 'yes' to confirm deletion");
