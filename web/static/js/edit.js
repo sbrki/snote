@@ -45,9 +45,13 @@ let noteJson;
 	const response = await fetch(`/api/note/${currentNoteId}`);
 
 	if (response.status !== 200) {
-		alert("Error sending GET request to fetch note");
-		alert(xhr.status);
-
+		if (response.status === 404) {
+			alert("Note not found (404)");
+		}
+		else {
+			alert("Error sending GET request to fetch note");
+			alert(xhr.status);
+		}
 		return;
 	}
 

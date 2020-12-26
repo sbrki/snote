@@ -47,13 +47,6 @@ func (s *Server) setupRoutes() {
 	})
 
 	s.echo.GET("/:note_id/edit", func(c echo.Context) error {
-		id := c.Param("note_id")
-
-		_, err := s.storage.LoadNote(id)
-		if err != nil && id != "ls" {
-			return echo.NewHTTPError(http.StatusNotFound, "404 Not found")
-		}
-
 		return c.Render(http.StatusOK, "edit.html", nil)
 	})
 
