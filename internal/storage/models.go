@@ -5,6 +5,9 @@ import (
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/gomarkdown/markdown"
+	"github.com/gomarkdown/markdown/parser"
 )
 
 type Note struct {
@@ -14,6 +17,12 @@ type Note struct {
 	Tags     []string  `json:"tags"`
 	LastEdit time.Time `json:"last_edit"`
 	IsPublic bool      `json:"is_public"`
+}
+
+func (note *Note) RenderHTML() string {
+	parser := parser.NewWithExtensions(parser.CommonExtensions)
+	html := markdown.ToHTML([]byte(note.Contents), parser, nil)
+	return string(html)
 }
 
 func (note *Note) ParseTitle() string {
@@ -30,6 +39,11 @@ func (note *Note) ParseTitle() string {
 	// remove the preifx # that regex has matched and remove any whitespace
 	title = strings.TrimSpace(strings.Split(title, "#")[1])
 	return title
+}
+
+func (note *Note) ParseTags() []string {
+	// TODO
+	return make([]string, 0)
 }
 
 func (note *Note) GenerateLs(storage Storage) error {

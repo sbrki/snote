@@ -78,8 +78,7 @@ func (s *Server) setupRoutes() {
 		html, found := s.renderCache.Get(note.ID)
 		if !found {
 			// if not, render it
-			parser := parser.NewWithExtensions(parser.CommonExtensions)
-			html = markdown.ToHTML([]byte(note.Contents), parser, nil)
+			html = note.RenderHTML()
 			// add it to cache
 			s.renderCache.SetDefault(note.ID, html)
 		}
