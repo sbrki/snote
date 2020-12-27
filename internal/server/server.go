@@ -122,7 +122,7 @@ func (s *Server) setupRoutes() {
 	s.echo.POST("/api/note", s.noteCollectionPostHandler)
 	// blob endpoints
 	s.echo.POST("/api/blob", s.blobCollectionPostHandler)
-	s.echo.GET("/api/blob/:blob_id", s.blobGetHandler)
+	s.echo.GET("/api/blob/:blob_id/:browser_filename", s.blobGetHandler)
 
 }
 

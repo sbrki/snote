@@ -176,7 +176,9 @@ let dropzone = new Dropzone("#file-upload",
 					let loc = f.xhr.getResponseHeader("Location");
 					let doc = editor.getDoc();
 					let cur = doc.getCursor();
-					doc.replaceRange(`![](${loc})\n`, cur);
+					let filename = f.name;
+					let filesize = (f.size / (1000**2)).toFixed(2);
+					doc.replaceRange(`![${filename} (${filesize}M)](${loc})\n`, cur);
 					saveNote();
 				} else {
 					alert("file upload failed");

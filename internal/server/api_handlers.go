@@ -153,7 +153,7 @@ func (s *Server) blobCollectionPostHandler(c echo.Context) error {
 	}
 
 	// set the response location header
-	c.Response().Header().Set(echo.HeaderLocation, "/api/blob/"+checksum)
+	c.Response().Header().Set(echo.HeaderLocation, "/api/blob/"+checksum+"/"+file.Filename)
 	return c.NoContent(http.StatusCreated)
 }
 
