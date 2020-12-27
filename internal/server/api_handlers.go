@@ -1,7 +1,10 @@
 package server
 
 import (
+	"bytes"
 	"crypto/sha256"
+	"encoding/hex"
+	"io"
 	"net/http"
 	"time"
 
@@ -128,20 +131,35 @@ func (s *Server) blobCollectionPostHandler(c echo.Context) error {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	id, err := s.storage.CreateBlob(src, sha256.New())
+	// since src is implemented as a multipart stream, calculating its
+	// checksum would consume it, so we first copy it to a buffer.
+	// probably dangerous for huge files.
+	buffer := new(bytes.Buffer)
+	if _, err = io.Copy(buffer, src); err != nil {
+		c.Logger().Error(err)
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	// calculate checksum of the uploaded file
+	hasher := sha256.New()
+	hasher.Write(buffer.Bytes())
+	checksum := hex.EncodeToString(hasher.Sum(nil))
+
+	// save it to storage
+	err = s.storage.SaveBlob(checksum, *buffer)
 	if err != nil {
 		c.Logger().Error(err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	// set the location header
-	c.Response().Header().Set(echo.HeaderLocation, "/api/blob/"+id)
+	// set the response location header
+	c.Response().Header().Set(echo.HeaderLocation, "/api/blob/"+checksum)
 	return c.NoContent(http.StatusCreated)
 }
 
 func (s *Server) blobGetHandler(c echo.Context) error {
 	id := c.Param("blob_id")
-	path, err := s.storage.GetBlobPath(id)
+	path, err := s.storage.LoadBlobPath(id)
 	if err != nil {
 		return c.NoContent(http.StatusNotFound)
 	}

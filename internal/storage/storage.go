@@ -1,8 +1,7 @@
 package storage
 
 import (
-	"hash"
-	"io"
+	"bytes"
 )
 
 type Storage interface {
@@ -11,7 +10,7 @@ type Storage interface {
 	DeleteNote(id string) error
 	GetAllNoteIDs() ([]string, error)
 
-	CreateBlob(src io.Reader, hashAlg hash.Hash) (id string, err error)
-	GetBlobPath(id string) (string, error)
+	SaveBlob(id string, data bytes.Buffer) error
+	LoadBlobPath(id string) (string, error)
 	//DeleteBlob(id string) error
 }
