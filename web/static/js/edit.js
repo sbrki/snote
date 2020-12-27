@@ -164,6 +164,26 @@ async function deleteNotePrompt() {
 	}
 }
 
+// file upload (via dropzone.js)
+let dropzone = new Dropzone("#file-upload",
+	{ 
+		url: "/api/blob",
+		clickable: false,
+		init: function() {
+			this.on("complete", function(f) {
+				if (f.xhr.status == 201) {
+					let loc = f.xhr.getResponseHeader("Location");
+					let doc = editor.getDoc();
+					let cur = doc.getCursor();
+					doc.replaceRange(`![](${loc})`, cur);
+				} else {
+					alert("file upload failed")
+				}
+				this.removeFile(f);
+			});
+		},
+	},
+);
 
 // animate.css utility function taken from official docs
 const animateCSS = (element, animation, prefix = 'animate__') => {

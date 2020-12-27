@@ -5,58 +5,61 @@
 	<body>
 
 
-<div class="pure-g">
-	<div class="pure-u-1">
-		<div class="pure-menu pure-menu-horizontal" style="display:block;">
-			<ul class="pure-menu-list">
-				<li class="pure-menu-item">
-					<a href="#" class="pure-menu-link" style="color:#add8e6;">snote</a>
-				</li>	
-				<li class="pure-menu-item">
-					<input id="vim-checkbox" style="display:none;" type="checkbox"/>
-					<label id="vim-checkbox-label" for="vim-checkbox" class="pure-menu-link">vim mode</label>
-				</li>
-				<li class="pure-menu-item">
-					<div id="save-button-animator">
-						<span id="save-button" class="pure-menu-link" onclick="saveNote();">save</span>
-					</div>
-				</li>	
-				<li class="pure-menu-item">
-					<div id="save-button-animator">
-						<a id="preview-url" class="pure-menu-link">preview</a>
-					</div>
-				</li>	
-				<li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
-					<a href="#" id="menuLink1" class="pure-menu-link">menu</a>
-					<ul class="pure-menu-children">
+		<div class="pure-g">
+			<div class="pure-u-1">
+				<div class="pure-menu pure-menu-horizontal" style="display:block;">
+					<ul class="pure-menu-list">
 						<li class="pure-menu-item">
-							<a href="#" class="pure-menu-link" style="color:blue;" onclick="newNotePrompt();">new note</a>
+							<a href="#" class="pure-menu-link" style="color:#add8e6;">snote</a>
+						</li>	
+						<li class="pure-menu-item">
+							<input id="vim-checkbox" style="display:none;" type="checkbox"/>
+							<label id="vim-checkbox-label" for="vim-checkbox" class="pure-menu-link">vim mode</label>
 						</li>
 						<li class="pure-menu-item">
-							<a href="/ls" class="pure-menu-link">all notes (/ls)</a>
-						</li>
+							<div id="save-button-animator">
+								<span id="save-button" class="pure-menu-link" onclick="saveNote();">save</span>
+							</div>
+						</li>	
 						<li class="pure-menu-item">
-							<a href="#" class="pure-menu-link">all tags(/lstag)</a>
-						</li>
-						<li class="pure-menu-item">
-							<a href="#" class="pure-menu-link">search</a>
-						</li>
-						<li class="pure-menu-item">
-							<hr style+"pure-menu-link"/>
-						</li>
-						<li class="pure-menu-item">
-							<a href="#" class="pure-menu-link" style="color:red;" onclick="deleteNotePrompt();">delete note</a>
+							<div id="save-button-animator">
+								<a id="preview-url" class="pure-menu-link">preview</a>
+							</div>
+						</li>	
+						<li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+							<a href="#" id="menuLink1" class="pure-menu-link">menu</a>
+							<ul class="pure-menu-children">
+								<li class="pure-menu-item">
+									<a href="#" class="pure-menu-link" style="color:blue;" onclick="newNotePrompt();">new note</a>
+								</li>
+								<li class="pure-menu-item">
+									<a href="/ls" class="pure-menu-link">all notes (/ls)</a>
+								</li>
+								<li class="pure-menu-item">
+									<a href="#" class="pure-menu-link">all tags(/lstag)</a>
+								</li>
+								<li class="pure-menu-item">
+									<a href="#" class="pure-menu-link">search</a>
+								</li>
+								<li class="pure-menu-item">
+									<hr style+"pure-menu-link"/>
+								</li>
+								<li class="pure-menu-item">
+									<a href="#" class="pure-menu-link" style="color:red;" onclick="deleteNotePrompt();">delete note</a>
+								</li>
+							</ul>
 						</li>
 					</ul>
-				</li>
-			</ul>
+				</div>
+			</div>
 		</div>
-	</div>
-</div>
 
 
 
-		<textarea id="editor" style="width:80%; height:80vh;"></textarea>
+		<form id="file-upload">
+			<textarea id="editor" style="width:80%; height:80vh;"></textarea>
+		</form>
+
 		<script src="/static/js/edit.js" async defer></script>
 	</body>
 </html>
