@@ -1,7 +1,11 @@
 package storage
 
 import (
+	"bytes"
+	"encoding/hex"
 	"encoding/json"
+	"hash"
+	"io"
 	"io/ioutil"
 	"os"
 	"path"
@@ -12,10 +16,11 @@ type DiskStorage struct {
 	path string
 }
 
-func NewDiskStorage(path string) *DiskStorage {
+func NewDiskStorage(storagePath string) *DiskStorage {
 	// create path if it doesn't exists
-	os.MkdirAll(path, 0700)
-	return &DiskStorage{path}
+	os.MkdirAll(storagePath, 0700)
+	os.MkdirAll(path.Join(storagePath, "blobs"), 0700)
+	return &DiskStorage{storagePath}
 }
 
 func (ds *DiskStorage) LoadNote(id string) (*Note, error) {
@@ -66,4 +71,40 @@ func (ds *DiskStorage) GetAllNoteIDs() ([]string, error) {
 		}
 	}
 	return IDs, nil
+}
+
+func (ds *DiskStorage) CreateBlob(src io.Reader, hashAlg hash.Hash) (id string, err error) {
+	// since src is underneath a multipart stream, calculating it's hash would consume it,
+	// so it needs to be copied into a memory buffer first. Probably dangerous for huge files.
+	buffer := new(bytes.Buffer)
+
+	if _, err := io.Copy(buffer, src); err != nil {
+		return id, err
+	}
+
+	hashAlg.Write(buffer.Bytes())
+	id = hex.EncodeToString(hashAlg.Sum(nil))
+
+	// with the calculated file checksum (id), write the buffer to a file
+	filename := path.Join(ds.path, "blobs", id)
+	dst, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0700)
+	defer dst.Close()
+	if err != nil {
+		return id, err
+	}
+	dst.Write(buffer.Bytes())
+
+	return id, nil
+}
+
+func (ds *DiskStorage) GetBlobPath(id string) (string, error) {
+	filename := path.Join(ds.path, "blobs", id)
+
+	// check if the filename exists
+	if _, err := os.Stat(filename); err != nil {
+		if os.IsNotExist(err) {
+			return "", err
+		}
+	}
+	return filename, nil
 }

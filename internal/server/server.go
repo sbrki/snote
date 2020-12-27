@@ -116,10 +116,15 @@ func (s *Server) setupRoutes() {
 	})
 
 	// API
+	// note endpoints
 	s.echo.GET("/api/note/:note_id", s.noteGetHandler)
 	s.echo.PUT("/api/note/:note_id", s.notePutHandler)
 	s.echo.DELETE("/api/note/:note_id", s.noteDeleteHandler)
 	s.echo.POST("/api/note", s.noteCollectionPostHandler)
+	// blob endpoints
+	s.echo.POST("/api/blob", s.blobCollectionPostHandler)
+	s.echo.GET("/api/blob/:blob_id", s.blobGetHandler)
+
 }
 
 func (s *Server) Run() {

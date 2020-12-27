@@ -1,6 +1,7 @@
 package server
 
 import (
+	"crypto/sha256"
 	"net/http"
 	"time"
 
@@ -111,5 +112,38 @@ func (s *Server) noteCollectionPostHandler(c echo.Context) error {
 	}
 
 	return c.NoContent(http.StatusCreated)
+}
 
+func (s *Server) blobCollectionPostHandler(c echo.Context) error {
+	file, err := c.FormFile("file")
+	if err != nil {
+		c.Logger().Error(err)
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	src, err := file.Open()
+	defer src.Close()
+	if err != nil {
+		c.Logger().Error(err)
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	id, err := s.storage.CreateBlob(src, sha256.New())
+	if err != nil {
+		c.Logger().Error(err)
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	// set the location header
+	c.Response().Header().Set(echo.HeaderLocation, "/api/blob/"+id)
+	return c.NoContent(http.StatusCreated)
+}
+
+func (s *Server) blobGetHandler(c echo.Context) error {
+	id := c.Param("blob_id")
+	path, err := s.storage.GetBlobPath(id)
+	if err != nil {
+		return c.NoContent(http.StatusNotFound)
+	}
+	return c.File(path)
 }
