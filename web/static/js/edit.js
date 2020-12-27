@@ -175,9 +175,11 @@ let dropzone = new Dropzone("#file-upload",
 					let loc = f.xhr.getResponseHeader("Location");
 					let doc = editor.getDoc();
 					let cur = doc.getCursor();
-					doc.replaceRange(`![](${loc})`, cur);
+					doc.replaceRange(`![](${loc})\n`, cur);
+					saveNote();
 				} else {
-					alert("file upload failed")
+					alert("file upload failed");
+					alert(f.xhr.status);
 				}
 				this.removeFile(f);
 			});
