@@ -168,6 +168,7 @@ async function deleteNotePrompt() {
 let dropzone = new Dropzone("#file-upload",
 	{ 
 		url: "/api/blob",
+		maxFilesize: 2048, // 2GiB
 		clickable: false,
 		init: function() {
 			this.on("complete", function(f) {
