@@ -28,10 +28,8 @@ func NewServer(storage storage.Storage, templateRegistry *TemplateRegistry) *Ser
 	s.echo.Renderer = s.templateRegistry
 	s.renderCache = cache.New(1*time.Hour, 1*time.Minute)
 
-	s.echo.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
-		Format: "method=${method}, uri=${uri}, status=${status}, " +
-			"lat=${latency_human}, ip=${remote_ip}, in=${bytes_in}, out=${bytes_out}\n",
-	}))
+	// use the default echo json logger
+	s.echo.Use(middleware.Logger())
 
 	s.echo.Static("/static", "web/static")
 	s.echo.File("/favicon.ico", "web/static/favicon.ico")
