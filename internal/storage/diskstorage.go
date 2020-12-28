@@ -16,12 +16,13 @@ type DiskStorage struct {
 func NewDiskStorage(storagePath string) *DiskStorage {
 	// create path if it doesn't exists
 	os.MkdirAll(storagePath, 0700)
+	os.MkdirAll(path.Join(storagePath, "notes"), 0700)
 	os.MkdirAll(path.Join(storagePath, "blobs"), 0700)
 	return &DiskStorage{storagePath}
 }
 
 func (ds *DiskStorage) LoadNote(id string) (*Note, error) {
-	filename := path.Join(ds.path, id+".json")
+	filename := path.Join(ds.path, "notes", id+".json")
 	b, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
@@ -32,7 +33,7 @@ func (ds *DiskStorage) LoadNote(id string) (*Note, error) {
 }
 
 func (ds *DiskStorage) SaveNote(note *Note) error {
-	filename := path.Join(ds.path, note.ID+".json")
+	filename := path.Join(ds.path, "notes", note.ID+".json")
 	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0700)
 	defer f.Close()
 	if err != nil {
@@ -47,7 +48,7 @@ func (ds *DiskStorage) SaveNote(note *Note) error {
 }
 
 func (ds *DiskStorage) DeleteNote(id string) error {
-	err := os.Remove(path.Join(ds.path, id+".json"))
+	err := os.Remove(path.Join(ds.path, "notes", id+".json"))
 	if err != nil {
 		return err
 	}
@@ -55,8 +56,9 @@ func (ds *DiskStorage) DeleteNote(id string) error {
 }
 
 func (ds *DiskStorage) GetAllNoteIDs() ([]string, error) {
+	notesPath := path.Join(ds.path, "notes")
 	IDs := make([]string, 0)
-	files, err := ioutil.ReadDir(ds.path)
+	files, err := ioutil.ReadDir(notesPath)
 	if err != nil {
 		return nil, err
 	}
