@@ -12,5 +12,6 @@ type Storage interface {
 
 	SaveBlob(id string, data bytes.Buffer) error
 	LoadBlobPath(id string) (string, error)
-	//DeleteBlob(id string) error
+	DeleteBlob(id string) error
+	GetAllBlobIDs() ([]string, error)
 }

@@ -94,3 +94,29 @@ func (ds *DiskStorage) LoadBlobPath(id string) (string, error) {
 	}
 	return filename, nil
 }
+
+func (ds *DiskStorage) DeleteBlob(id string) error {
+	filename := path.Join(ds.path, "blobs", id)
+	err := os.Remove(filename)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (ds *DiskStorage) GetAllBlobIDs() ([]string, error) {
+	blobsPath := path.Join(ds.path, "blobs")
+	result := make([]string, 0)
+
+	files, err := ioutil.ReadDir(blobsPath)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, file := range files {
+		if !file.IsDir() {
+			result = append(result, file.Name())
+		}
+	}
+	return result, nil
+}

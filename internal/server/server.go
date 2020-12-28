@@ -11,6 +11,7 @@ import (
 	"github.com/labstack/echo/middleware"
 	"github.com/patrickmn/go-cache"
 	"github.com/sbrki/snote/internal/storage"
+	"github.com/sbrki/snote/internal/util"
 )
 
 type Server struct {
@@ -124,6 +125,69 @@ func (s *Server) setupRoutes() {
 
 }
 
+// parses all user-uploaded blobs from all notes and deletes blobs
+// from the storage if they are not referenced in any note.
+func (s *Server) deleteUnusedBlobs() {
+	usedBlobIDs := make([]string, 0)
+	allNoteIDs, err := s.storage.GetAllNoteIDs()
+	if err != nil {
+		s.echo.Logger.Error(err)
+		return
+	}
+
+	// collect all user-uploaded blob IDs from all notes in storage
+	for _, noteID := range allNoteIDs {
+		note, err := s.storage.LoadNote(noteID)
+		if err != nil {
+			s.echo.Logger.Error(err)
+			return
+		}
+		noteBlobIDs := note.ParseBlobIDs()
+		usedBlobIDs = append(usedBlobIDs, noteBlobIDs...)
+	}
+
+	// if there are no user-uploaded blobs in any of the notes, return.
+	// also acts as a sanity check, if for some reason note loading/parsing
+	// failed (although all fail cases seem to be covered above), prevent
+	// deleting all of the blobs currently stored in storage.
+	if len(usedBlobIDs) == 0 {
+		return
+	}
+
+	// collect all blob IDs across all blobs currently stored in storage
+	allStorageBlobIDs, err := s.storage.GetAllBlobIDs()
+	if err != nil {
+		s.echo.Logger.Error(err)
+		return
+	}
+
+	// delete blobs that are not used, ie. that are present in allStorageBlobIDs
+	// but not present in usedBlobIDs.
+	for _, storageBlobID := range allStorageBlobIDs {
+		used := util.SliceContainsString(usedBlobIDs, storageBlobID)
+		if !used {
+			err = s.storage.DeleteBlob(storageBlobID)
+			if err != nil {
+				s.echo.Logger.Error(err)
+				return
+			}
+			s.echo.Logger.Info("deleted blob:" + storageBlobID)
+		}
+	}
+
+}
+
+// ment to be run as a separate goroutine and do housekeeping tasks.
+func (s *Server) backgroundJobs() {
+	for {
+		time.Sleep(5 * time.Second)
+		s.deleteUnusedBlobs()
+	}
+}
+
 func (s *Server) Run() {
+	// start background jobs
+	go s.backgroundJobs()
+
 	s.echo.Logger.Fatal(s.echo.Start(":8081"))
 }
