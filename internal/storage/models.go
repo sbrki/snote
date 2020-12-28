@@ -77,7 +77,7 @@ func (note *Note) ParseBlobIDs() []string {
 		trimmedURL := strings.TrimSpace(url)
 		if strings.HasPrefix(trimmedURL, "/api/blob/") {
 			// the url points to a user-uplaoded blob.
-			// parse the ID of the blob_id (url is of format: /api/blob/:blob_id/:browser_helper)
+			// parse the blob_id (url is of format: /api/blob/:blob_id/:browser_helper)
 			blobID := strings.Split(trimmedURL, "/")[3]
 			blobIDs = append(blobIDs, blobID)
 		}
@@ -108,7 +108,7 @@ func (note *Note) GenerateLs(storage Storage) error {
 			return err
 		}
 		noteLine := "|"
-		noteLine += note.Title + " |"
+		noteLine += "**" + note.Title + "** |"
 		noteLine += fmt.Sprintf("[/%s](/%s)", noteID, noteID) + "|"
 		noteLine += noteID + "|"
 		noteLine += fmt.Sprintf("%d", len(note.Contents)) + "|"
