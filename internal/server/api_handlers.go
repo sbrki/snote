@@ -41,26 +41,23 @@ func (s *Server) notePutHandler(c echo.Context) error {
 	// get stale.
 	s.renderCache.Delete(id)
 
-	_, exists := s.storage.LoadNote(id)
-
 	updatedNote := new(storage.Note)
+
 	if err := c.Bind(updatedNote); err != nil {
 		c.Logger().Error(err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "error bining request body json to storage.Note struct (check logs for more info)")
 	}
+
 	updatedNote.LastEdit = time.Now()
+	updatedNote.Title = updatedNote.ParseTitle()
+
 	err := s.storage.SaveNote(updatedNote)
 	if err != nil {
 		c.Logger().Error(err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "error saving note (check logs for more info)")
 	}
 
-	// return 200 if note was updated
-	if exists == nil {
-		return c.NoContent(http.StatusOK)
-	}
-	// return 201 if new note was created
-	return c.NoContent(http.StatusCreated)
+	return c.NoContent(http.StatusOK)
 }
 
 func (s *Server) noteDeleteHandler(c echo.Context) error {

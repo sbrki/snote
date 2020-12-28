@@ -73,6 +73,8 @@ func (s *Server) setupRoutes() {
 			note = storedNote
 		}
 
+		fmt.Println("TITLE:", note.ParseTitle())
+
 		// render the note markdown contents to html.
 		// rendered html is cached as it takes approx. 1s to render a 5k LoC markdown.
 		// first, check if html rendering of markdown exists in cache
