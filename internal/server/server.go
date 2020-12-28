@@ -88,31 +88,6 @@ func (s *Server) setupRoutes() {
 		}{fmt.Sprintf("%s", html), note.ID})
 	})
 
-	s.echo.GET("/somenote", func(c echo.Context) error {
-		n := new(storage.Note)
-		n.ID = "prvi"
-		n.Contents = "# helo\n* lista\n* jos!\n	* podlista?"
-		n.Title = "helo"
-		n.IsPublic = false
-		n.LastEdit = time.Now()
-
-		//fmt.Println(n.ParseTitle())
-
-		err := s.storage.SaveNote(n)
-		if err != nil {
-			c.Logger().Fatal(err)
-		}
-
-		note, err := s.storage.LoadNote("prvi")
-		if err != nil {
-			c.Logger().Error(err)
-		}
-		fmt.Println("Note read from disk")
-		fmt.Println(note)
-
-		return c.JSON(http.StatusOK, n)
-	})
-
 	// API
 	// note endpoints
 	s.echo.GET("/api/note/:note_id", s.noteGetHandler)

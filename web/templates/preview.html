@@ -14,6 +14,11 @@
 						<li class="pure-menu-item">
 							<a href="/{{.ID}}/edit" class="pure-menu-link">edit</a>
 						</li>
+						<li class="pure-menu-item">
+							<div id="save-button-animator">
+								<a href="#" class="pure-menu-link" onclick="newNotePrompt();" style="color:blue;">new</a>
+							</div>
+						</li>	
 					</ul>
 				</div>
 			</div>
@@ -27,7 +32,8 @@
 			<div class="pure-u-5-24"></div>
 		</div>
 
-		<script>
+		
+		<script type="module">
 			document.querySelectorAll('img').forEach(x=>x.classList.add('pure-img'));
 			document.querySelectorAll('table').forEach(x=>x.classList.add('pure-table'));
 			document.addEventListener('DOMContentLoaded', (event) => {
@@ -36,5 +42,7 @@
 				});
 			});
 		</script>
+		<script src="/static/js/new.js" async defer></script>
+
 	</body>
 </html>
