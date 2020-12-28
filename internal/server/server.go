@@ -9,6 +9,7 @@ import (
 	"github.com/gomarkdown/markdown/parser"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"github.com/labstack/gommon/log"
 	"github.com/patrickmn/go-cache"
 	"github.com/sbrki/snote/internal/storage"
 	"github.com/sbrki/snote/internal/util"
@@ -31,6 +32,7 @@ func NewServer(storage storage.Storage, templateRegistry *TemplateRegistry) *Ser
 
 	// use the default echo json logger
 	s.echo.Use(middleware.Logger())
+	s.echo.Logger.SetLevel(log.INFO)
 
 	s.echo.Static("/static", "web/static")
 	s.echo.File("/favicon.ico", "web/static/favicon.ico")
