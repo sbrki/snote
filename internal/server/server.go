@@ -55,9 +55,13 @@ func (s *Server) setupRoutes() {
 		id := c.Param("note_id")
 		var note *storage.Note
 
-		if id == "ls" {
+		if id == "ls" || id == "lstag" {
 			note := new(storage.Note)
-			note.GenerateLs(s.storage)
+			if id == "ls" {
+				note.GenerateLs(s.storage)
+			} else {
+				note.GenerateLsTag(s.storage)
+			}
 			parser := parser.NewWithExtensions(parser.CommonExtensions)
 			html := markdown.ToHTML([]byte(note.Contents), parser, nil)
 			return c.Render(http.StatusOK, "preview.html", struct {
@@ -167,6 +171,11 @@ func (s *Server) backgroundJobs() {
 func (s *Server) Run() {
 	// start background jobs
 	go s.backgroundJobs()
+
+	fmt.Println(s.storage.SetNoteTags("test", []string{"a", "b"}))
+	fmt.Println(s.storage.SetNoteTags("test", []string{"b", "c"}))
+	fmt.Println(s.storage.SetNoteTags("a", []string{"b", "c"}))
+	fmt.Println(s.storage.SetNoteTags("kek", []string{"a", "b"}))
 
 	s.echo.Logger.Fatal(s.echo.Start(":8081"))
 }

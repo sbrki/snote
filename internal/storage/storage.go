@@ -36,4 +36,12 @@ type Storage interface {
 	DeleteBlob(id string) error
 	// GetAllBlobIDs fetches IDs of all blobs currently in storage.
 	GetAllBlobIDs() ([]string, error)
+
+	// SetNoteTags sets the tags of a particular note. Note struct itself has no knowledge
+	// of its tags, they are ment to be stored in a seperate structure/index.
+	// SetNoteTags is also used to remove tags. For example if a note had tags ["a","b"],
+	// and SetNoteTags was called with ["b", "c"], the resulting tags would be ["b", "c"].
+	SetNoteTags(id string, tags []string) error
+	// GetAllNoteTags fetches all tags along with all the corresponding note IDs.
+	GetAllNoteTags() (map[string][]string, error)
 }
