@@ -18,6 +18,9 @@ func (s *Server) noteGetHandler(c echo.Context) error {
 	if id == "ls" {
 		note = new(storage.Note)
 		note.GenerateLs(s.storage)
+	} else if id == "lstag" {
+		note = new(storage.Note)
+		note.GenerateLsTag(s.storage)
 	} else {
 		storedNote, err := s.storage.LoadNote(id)
 		if err != nil {
@@ -51,10 +54,18 @@ func (s *Server) notePutHandler(c echo.Context) error {
 	updatedNote.LastEdit = time.Now()
 	updatedNote.Title = updatedNote.ParseTitle()
 
+	// save note to storage
 	err := s.storage.SaveNote(updatedNote)
 	if err != nil {
 		c.Logger().Error(err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "error saving note (check logs for more info)")
+	}
+
+	// update note tags to storage (tag index)
+	err = s.storage.SetNoteTags(id, updatedNote.ParseTags())
+	if err != nil {
+		c.Logger().Error(err)
+		return c.NoContent(http.StatusInternalServerError)
 	}
 
 	return c.NoContent(http.StatusOK)

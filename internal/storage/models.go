@@ -46,7 +46,31 @@ func (note *Note) ParseTitle() string {
 
 func (note *Note) ParseTags() []string {
 	// TODO
-	return make([]string, 0)
+	tags := make([]string, 0)
+
+	parser := parser.NewWithExtensions(parser.CommonExtensions)
+	rootNode := parser.Parse([]byte(note.Contents))
+
+	ast.WalkFunc(rootNode, func(node ast.Node, entering bool) ast.WalkStatus {
+		if entering {
+			switch n := node.(type) {
+			case *ast.Code:
+				if strings.HasPrefix(string(n.Leaf.Literal), "tags:") {
+					rawTags := strings.Split(
+						string(n.Leaf.Literal), "tags:",
+					)[1]
+					rawTagsAsSlice := strings.Split(rawTags, ",")
+					for _, tag := range rawTagsAsSlice {
+						tags = append(tags, strings.TrimSpace(tag))
+					}
+					return ast.Terminate // terminate on first parsed heading
+				}
+			}
+		}
+		return ast.GoToNext // continue with next node
+	})
+
+	return tags
 }
 
 func (note *Note) ParseBlobIDs() []string {

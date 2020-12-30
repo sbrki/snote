@@ -163,7 +163,7 @@ func (s *Server) deleteUnusedBlobs() {
 // ment to be run as a separate goroutine and do housekeeping tasks.
 func (s *Server) backgroundJobs() {
 	for {
-		time.Sleep(5 * time.Second)
+		time.Sleep(1 * time.Hour)
 		s.deleteUnusedBlobs()
 	}
 }
@@ -171,11 +171,5 @@ func (s *Server) backgroundJobs() {
 func (s *Server) Run() {
 	// start background jobs
 	go s.backgroundJobs()
-
-	fmt.Println(s.storage.SetNoteTags("test", []string{"a", "b"}))
-	fmt.Println(s.storage.SetNoteTags("test", []string{"b", "c"}))
-	fmt.Println(s.storage.SetNoteTags("a", []string{"b", "c"}))
-	fmt.Println(s.storage.SetNoteTags("kek", []string{"a", "b"}))
-
 	s.echo.Logger.Fatal(s.echo.Start(":8081"))
 }
