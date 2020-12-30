@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"io"
+	"os"
 	"text/template"
 
 	"github.com/labstack/echo"
@@ -23,7 +25,12 @@ var t = &Template{
 
 func main() {
 	// setup disk storage
-	ds := storage.NewDiskStorage("/tmp/snotestorage")
+	diskStoragePath, isSet := os.LookupEnv("STORAGE_PATH")
+	if !isSet {
+		diskStoragePath = "/tmp"
+	}
+	fmt.Println("Using storage path:", diskStoragePath)
+	ds := storage.NewDiskStorage(diskStoragePath)
 	// setup templates
 	tr := server.NewTemplateRegistry("web/templates/*.html")
 	// create server

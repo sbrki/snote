@@ -1,0 +1,12 @@
+version: '3.3'
+
+services:
+   snote:
+     build: .
+     ports:
+       - "8081:8081"
+     restart: unless-stopped
+     environment:
+       STORAGE_PATH: /data
+     volumes:
+       - /host/dir:/data

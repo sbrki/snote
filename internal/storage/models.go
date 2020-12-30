@@ -61,7 +61,7 @@ func (note *Note) ParseTags() []string {
 					)[1]
 					rawTagsAsSlice := strings.Split(rawTags, ",")
 					for _, tag := range rawTagsAsSlice {
-						tags = append(tags, strings.TrimSpace(tag))
+						tags = append(tags, strings.ToLower(strings.TrimSpace(tag)))
 					}
 					return ast.Terminate // terminate on first parsed heading
 				}

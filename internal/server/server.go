@@ -1,12 +1,8 @@
 package server
 
 import (
-	"fmt"
-	"net/http"
 	"time"
 
-	"github.com/gomarkdown/markdown"
-	"github.com/gomarkdown/markdown/parser"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/labstack/gommon/log"
@@ -43,60 +39,11 @@ func NewServer(storage storage.Storage, templateRegistry *TemplateRegistry) *Ser
 }
 
 func (s *Server) setupRoutes() {
-	s.echo.GET("/", func(c echo.Context) error {
-		return c.Redirect(http.StatusTemporaryRedirect, "/ls")
-	})
-
-	s.echo.GET("/:note_id/edit", func(c echo.Context) error {
-		return c.Render(http.StatusOK, "edit.html", nil)
-	})
-
-	s.echo.GET("/:note_id", func(c echo.Context) error {
-		id := c.Param("note_id")
-		var note *storage.Note
-
-		if id == "ls" || id == "lstag" {
-			note := new(storage.Note)
-			if id == "ls" {
-				note.GenerateLs(s.storage)
-			} else {
-				note.GenerateLsTag(s.storage)
-			}
-			parser := parser.NewWithExtensions(parser.CommonExtensions)
-			html := markdown.ToHTML([]byte(note.Contents), parser, nil)
-			return c.Render(http.StatusOK, "preview.html", struct {
-				RenderedHTML string
-				ID           string
-			}{fmt.Sprintf("%s", html), note.ID})
-
-		} else {
-			storedNote, err := s.storage.LoadNote(id)
-			if err != nil {
-				return echo.NewHTTPError(http.StatusNotFound, "404 Not found")
-			}
-			note = storedNote
-		}
-
-		fmt.Println("TITLE:", note.ParseTitle())
-
-		// render the note markdown contents to html.
-		// rendered html is cached as it takes approx. 1s to render a 5k LoC markdown.
-		// first, check if html rendering of markdown exists in cache
-		html, found := s.renderCache.Get(note.ID)
-		if !found {
-			// if not, render it
-			html = note.RenderHTML()
-			// add it to cache
-			s.renderCache.SetDefault(note.ID, html)
-		}
-
-		return c.Render(http.StatusOK, "preview.html", struct {
-			RenderedHTML string
-			ID           string
-		}{fmt.Sprintf("%s", html), note.ID})
-	})
-
-	// API
+	// setup non-api (HTML) handlers
+	s.echo.GET("/", s.htmlIndexHandler)
+	s.echo.GET("/:note_id", s.htmlNoteHandler)
+	s.echo.GET("/:note_id/edit", s.htmlNoteEditHandler)
+	// setup api handlers
 	// note endpoints
 	s.echo.GET("/api/note/:note_id", s.noteGetHandler)
 	s.echo.PUT("/api/note/:note_id", s.notePutHandler)
